@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Apihelper } from "../../common/service/ApiHelper";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { TailSpin } from 'react-loader-spinner';
 
 const MovieCreateForm = () => {
   const [form, setForm] = useState({
@@ -250,23 +249,7 @@ const MovieCreateForm = () => {
                 disabled={isLoading}
                 className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {isLoading ? (
-                  <>
-                    <TailSpin
-                      height="20"
-                      width="20"
-                      color="#ffffff"
-                      ariaLabel="tail-spin-loading"
-                      radius="1"
-                      wrapperStyle={{}}
-                      wrapperClass="mr-2"
-                      visible={true}
-                    />
-                    Creating...
-                  </>
-                ) : (
-                  "Create Movie"
-                )}
+                
               </button>
             </div>
           </form>
