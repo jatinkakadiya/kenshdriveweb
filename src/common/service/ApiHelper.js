@@ -20,6 +20,31 @@ export const Apihelper = {
     createMovise:(data)=>{
         return axios.post(Url+"/movise/uplode",data)
     },
+    AddSlider:(data)=>{
+        return axios.post(Url+"/slider/add",data)
+    },
+    ListSlider:()=>{
+        return axios.get(Url+"/slider/list")
+    },
+    DeleteMovise:(id)=>{
+        return axios.delete(Url+`/movise/delete/${id}`)
+    },
+    createplan:(data)=>{
+        return axios.post(Url+`/premium/create`,data)
+    },
+    Listplan:()=>{
+        return axios.get(Url+`/premium/all`,)
+    },
+    Activeplan:()=>{
+        return axios.get(Url+`/premium/active`,)
+    },
+    deleteplan:(id)=>{
+        return axios.delete(Url+`/premium/delete/${id}`,)
+    },
+    togalplan:(id)=>{
+        return axios.patch(Url+`/premium//toggle/${id}`,)
+    },
+
 
 
     // user api 

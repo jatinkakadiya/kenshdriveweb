@@ -84,7 +84,7 @@ export default function Header() {
                 { path: Path.movie, label: 'Movies' },
                 { path: Path.supports, label: 'Supports' },
                 { path: Path.subscription, label: 'Subscription' },
-                { path: '/video-upload', label: 'Video Upload' }
+                // { path: '/video-upload', label: 'Video Upload' }
               ].map(({ path, label }) => (
                 <button
                   key={label}

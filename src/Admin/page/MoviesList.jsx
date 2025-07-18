@@ -23,6 +23,8 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import MovieCreateForm from './MovieCreateForm';
+import { Apihelper } from '../../common/service/ApiHelper';
+import { useEffect } from 'react';
 
 // Sample data - replace with your actual data
 const sampleMovies = [
@@ -37,6 +39,7 @@ const MoviesList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [movies, setMovies] = useState(sampleMovies);
 
+
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
@@ -45,9 +48,31 @@ const MoviesList = () => {
     setIsModalOpen(false);
   };
 
-  const handleDeleteMovie = (id) => {
-    setMovies(movies.filter(movie => movie.id !== id));
+  const handleDeleteMovie = async (id) => {
+    try {
+      await Apihelper.DeleteMovise(id)
+      ListMovis()
+    } catch (error) {
+      console.log(error)
+    }
+    console.log(id)
   };
+
+  async function ListMovis(params) {
+    try {
+      const res = await Apihelper.ListMovise()
+      console.log(res.data.data.movies
+      );
+      setMovies(res?.data?.data?.movies)
+    } catch (error) {
+
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+
+    ListMovis()
+  }, []);
 
   return (
     <Box sx={{ bgcolor: 'black', minHeight: '100vh', py: 4 }}>
@@ -84,9 +109,6 @@ const MoviesList = () => {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold' }}>Movie</TableCell>
-                  <TableCell sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold' }}>Category</TableCell>
-                  <TableCell sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold' }}>Language</TableCell>
-                  <TableCell align="right" sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold' }}>Duration</TableCell>
                   <TableCell align="right" sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold' }}>Views</TableCell>
                   <TableCell align="right" sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold' }}>Rating</TableCell>
                   <TableCell align="center" sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold' }}>Actions</TableCell>
@@ -95,7 +117,7 @@ const MoviesList = () => {
               <TableBody>
                 {movies.map((movie) => (
                   <TableRow
-                    key={movie.id}
+                    key={movie._id || movie.id}
                     sx={{
                       '&:last-child td': { borderBottom: 0 },
                       '&:hover': { bgcolor: '#1E1E1E' }
@@ -106,7 +128,7 @@ const MoviesList = () => {
                         <Movie sx={{ color: 'red', mr: 1 }} />
                         <Box>
                           <Typography variant="body1">
-                            {movie.title}
+                            {movie.name}
                           </Typography>
                           {movie.isPremium && (
                             <Typography variant="caption" sx={{ color: 'gold' }}>
@@ -116,9 +138,7 @@ const MoviesList = () => {
                         </Box>
                       </Box>
                     </TableCell>
-                    <TableCell sx={{ color: 'white', borderColor: '#333' }}>{movie.category}</TableCell>
-                    <TableCell sx={{ color: 'white', borderColor: '#333' }}>{movie.language}</TableCell>
-                    <TableCell align="right" sx={{ color: 'white', borderColor: '#333' }}>{movie.duration}</TableCell>
+                    {/* <TableCell sx={{ color: 'white', borderColor: '#333' }}>{movie.category}</TableCell> */}
                     <TableCell align="right" sx={{ color: 'white', borderColor: '#333' }}>{movie.views}</TableCell>
                     <TableCell align="right" sx={{ color: 'white', borderColor: '#333' }}>
                       <Box sx={{
@@ -128,21 +148,14 @@ const MoviesList = () => {
                         px: 1,
                         borderRadius: 1
                       }}>
-                        {movie.rating}/10
+                        {movie.ratings}/10
                       </Box>
                     </TableCell>
                     <TableCell align="center" sx={{ borderColor: '#333' }}>
                       <IconButton
                         size="small"
-                        sx={{ color: 'primary.main', mr: 1 }}
-                        onClick={() => console.log('Edit movie:', movie.id)}
-                      >
-                        <Edit sx={{ color: '#2196f3' }} />
-                      </IconButton>
-                      <IconButton
-                        size="small"
                         sx={{ color: 'error.main' }}
-                        onClick={() => handleDeleteMovie(movie.id)}
+                        onClick={() => handleDeleteMovie(movie._id)}
                       >
                         <Delete sx={{ color: '#f44336' }} />
                       </IconButton>

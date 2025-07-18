@@ -189,20 +189,20 @@ const SectionSlider = ({ title, description, data, showTag, slidesToShow = 4 }) 
             <Slider ref={sliderRef} {...settings}>
                 {data.map((item, index) => (
                     <div key={index} className="p-2 cursor-pointer">
+                            <Link to={`/moviedetails/${item.title}`}>
                         <div className="bg-[#18181b] text-white rounded-xl overflow-hidden p-2 relative shadow-lg">
                             <img
                                 src={item?.thumbnail || item.img}
                                 className="rounded w-full h-[300px] object-cover"
                                 alt={item.title}
                             />
-                            <Link to={`/movies/${item.title}`}>
                                 <div className="flex mt-2 justify-between items-center">
                                     <span className="text-base">{item.title}</span>
                                     <ArrowForwardIosIcon fontSize="small" />
                                 </div>
-                            </Link>
                             {showTag && <div className="absolute top-2 left-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Top 10</div>}
                         </div>
+                            </Link>
                     </div>
                 ))}
             </Slider>

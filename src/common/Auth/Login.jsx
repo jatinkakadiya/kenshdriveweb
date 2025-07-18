@@ -42,7 +42,6 @@ const LoginForm = () => {
         password
       };
 
-      navigate("/")
       const result = await Apihelper.Login(data);
 
       if (result.status === 200) {
@@ -52,7 +51,7 @@ const LoginForm = () => {
         localStorage.setItem("userinfo", JSON.stringify(user));
 
         if (user.role === "admin") {
-          navigate("/");
+          navigate("/admin");
         } else {
           navigate("/");
         }

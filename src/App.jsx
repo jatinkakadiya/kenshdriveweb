@@ -9,7 +9,6 @@ import MoviesList from './Admin/page/MoviesList';
 import Navbar from './common/Navbar/NavbarNav';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import SliderGallery from './Admin/page/SliderGallery';
 import PremiumPlans from './Admin/page/PremiumPlans';
 import Orders from './Admin/page/Orders';
 import Trials from './Admin/page/Trials';
@@ -22,6 +21,8 @@ import SubscriptionsScreen from './user/SubscriptionsScreen';
 import VideoUploadPreview from './user/VideoUploadPreview';
 import Footer from './common/Navbar/Footer';
 import UserScreen from './common/Auth/UserProfile';
+import MovieDetailsScreen from './user/MovieDetailsScreen';
+// import MovieForm from './Admin/page/MovieCreateForm';
 // import VideoUploadPreview from './user/localuploderscreen';
 
 
@@ -57,9 +58,7 @@ function App() {
           <Route path='/movies' element={<DeshbordLayouts>
             <MoviesList/>
           </DeshbordLayouts>} /> 
-          <Route path='/Gallary' element={<DeshbordLayouts>
-            <SliderGallery/>
-          </DeshbordLayouts>} /> 
+         
           <Route path='/login'element={<Userpage>
             <LoginForm/>
           </Userpage>}/>
@@ -89,6 +88,9 @@ function App() {
           </Userpage>} />
           <Route path='/userprofile' element={<Userpage>
             <UserScreen/>
+          </Userpage>} />
+          <Route path='/moviedetails/:id' element={<Userpage>
+            <MovieDetailsScreen/>
           </Userpage>} />
         </Routes>
       </BrowserRouter>

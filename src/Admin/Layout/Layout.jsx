@@ -62,7 +62,7 @@ export default function DashboardLayout({ children }) {
 
                 <nav className="p-4">
                     <ul className="space-y-2">
-                        <li className={getNavLinkClass("/")} onClick={() => setSidebarOpen(false)}>
+                        <li className={getNavLinkClass("/admin")} onClick={() => setSidebarOpen(false)}>
                             <Link to="/admin" className="flex items-center px-3 py-2 rounded hover:bg-stone-200 text-sm font-medium tracking-wide uppercase">
                                 <AnalyticsIcon className="mr-3" fontSize="small" />
                                 Analytics
@@ -74,12 +74,7 @@ export default function DashboardLayout({ children }) {
                                 movise
                             </Link>
                         </li>
-                        <li className={getNavLinkClass("/Gallary")} onClick={() => setSidebarOpen(false)}>
-                            <Link to="/Gallary" className="flex items-center px-3 py-2 rounded hover:bg-stone-200 text-sm font-medium tracking-wide uppercase">
-                                <GalleryIcon className="mr-3" fontSize="small" />
-                                Gallery
-                            </Link>
-                        </li>
+                       
                         <li className={getNavLinkClass("/premium")} onClick={() => setSidebarOpen(false)}>
                             <Link to="/premium" className="flex items-center px-3 py-2 rounded hover:bg-stone-200 text-sm font-medium tracking-wide uppercase">
                                 <PriceChangeIcon className="mr-3" fontSize="small" />
@@ -105,7 +100,7 @@ export default function DashboardLayout({ children }) {
                                     localStorage.removeItem("userinfo");
                                     navigate("/login");
                                 }}
-                                className="flex items-center w-full text-left px-3 py-2 p-20 rounded hover:bg-stone-200 text-base font-semibold uppercase"
+                                className="flex items-center w-full text-left px-3 py-2 p-20 rounded hover:bg-stone-200 hover:text-black text-base font-semibold uppercase"
                             >
                                 <LogoutIcon className="mr-3" fontSize="small" />
                                 Logout
