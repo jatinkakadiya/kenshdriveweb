@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 const LOCAL_STORAGE_KEY = 'videoHistory';
 
-export default function History() {
+export default function Historys() {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
