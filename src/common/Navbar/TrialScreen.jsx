@@ -5,7 +5,7 @@ export default function TrialScreen() {
 
     const navigete = useNavigate()
     return (
-        <div className="relative w-full h-[220px] md:h-[250px] flex items-center justify-center overflow-hidden pb-10">
+        <div className="relative w-full h-[320px] md:h-[250px] flex items-center justify-center overflow-hidden pb-10">
             <img
                 src="https://res.cloudinary.com/dmwiolmq1/image/upload/v1748178390/freetrial-bg-img_dcxfav.png"
                 alt="Free Trial Background"

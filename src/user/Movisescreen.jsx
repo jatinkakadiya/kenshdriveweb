@@ -13,7 +13,8 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Rating } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';;
+import { Link, useNavigate } from 'react-router-dom';import { Apihelper } from '../common/service/ApiHelper';
+;
 
 
 const slides = [
@@ -100,7 +101,7 @@ const SectionSlider = ({ title, description, data, showTag, slidesToShow = 4 }) 
     const navigate = useNavigate()
     const sliderRef = useRef(null);
     const [currentGroup, setCurrentGroup] = useState(0);
-
+const [Sliders, setSliders] = useState([]);
     const totalGroups = Math.ceil(data.length / slidesToShow); // adjust slidesToShow accordingly
 
     const settings = {
@@ -147,7 +148,19 @@ const SectionSlider = ({ title, description, data, showTag, slidesToShow = 4 }) 
         }
         return number.toString();
     }
-
+async function listmovise() {
+    try {
+        const res = await Apihelper.ListMovise()
+        console.log(res.data.data.movies);
+        setSliders(res.data.data.movies)
+    } catch (error) {
+        console.log(error);
+    }
+}
+useEffect(() => {
+    
+  listmovise()
+}, []);
     return (
         <div className="my-12 bg-black">
             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
@@ -187,17 +200,17 @@ const SectionSlider = ({ title, description, data, showTag, slidesToShow = 4 }) 
             </div>
 
             <Slider ref={sliderRef} {...settings}>
-                {data.map((item, index) => (
+                {Sliders.map((item, index) => (
                     <div key={index} className="p-2 cursor-pointer">
-                            <Link to={`/moviedetails/${item.title}`}>
+                            <Link to={`/moviedetails/${item._id}`}>
                         <div className="bg-[#18181b] text-white rounded-xl overflow-hidden p-2 relative shadow-lg">
                             <img
-                                src={item?.thumbnail || item.img}
+                                src={item?.thumbnail || item.thumbnail}
                                 className="rounded w-full h-[300px] object-cover"
-                                alt={item.title}
+                                alt={item.name}
                             />
                                 <div className="flex mt-2 justify-between items-center">
-                                    <span className="text-base">{item.title}</span>
+                                    <span className="text-base">{item.name}</span>
                                     <ArrowForwardIosIcon fontSize="small" />
                                 </div>
                             {showTag && <div className="absolute top-2 left-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Top 10</div>}

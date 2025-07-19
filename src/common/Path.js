@@ -4,7 +4,8 @@ const Path = {
     // details: "/moviedetails",
     supports: "/supports",
     subscription: "/subscription",
-    movie: "/movie",
+    movie: "/watch",
+    history: "/history",
 }
 
 export default Path

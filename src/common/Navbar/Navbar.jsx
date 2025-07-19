@@ -28,6 +28,7 @@ export default function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('videoHistory');
     setIsLoggedIn(false);
     navigate('/login');
   };
@@ -43,6 +44,18 @@ export default function Header() {
   useEffect(() => {
     setOpen(false);
   }, [location.pathname]);
+
+  // Prevent background scroll when mobile menu is open
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+    return () => {
+      document.body.classList.remove('overflow-hidden');
+    };
+  }, [open]);
 
   useEffect(() => {
     if (isHome) {
@@ -81,9 +94,11 @@ export default function Header() {
             <div className="flex gap-2">
               {[
                 { path: Path.home, label: 'Home' },
-                { path: Path.movie, label: 'Movies' },
+                { path: Path.movie, label: 'CloudStorege' },
+
                 { path: Path.supports, label: 'Supports' },
-                { path: Path.subscription, label: 'Subscription' },
+                { path: Path.subscription, label: 'More' },
+                { path: Path.history, label: 'History' },
                 // { path: '/video-upload', label: 'Video Upload' }
               ].map(({ path, label }) => (
                 <button
@@ -135,14 +150,15 @@ export default function Header() {
               ×
             </button>
           </div>
-          <div className="flex-1 flex flex-col justify-between">
+          <div className="flex-1 flex flex-col justify-between bg-black">
             <div className="p-6 flex flex-col gap-2">
               {[
                 { path: Path.home, label: 'Home' },
-                { path: Path.movie, label: 'Movies' },
+                { path: Path.movie, label: 'CloudStorege' },
                 { path: Path.supports, label: 'Supports' },
-                { path: Path.subscription, label: 'Subscription' },
-                { path: '/video-upload', label: 'Video Upload' }
+                { path: Path.subscription, label: 'More' },
+                { path: Path.history, label: 'History' },
+                // { path: '/video-upload', label: 'Video Upload' }
               ].map(({ path, label }) => (
                 <button
                   key={label}
@@ -175,16 +191,7 @@ export default function Header() {
                 </button>
               )}
             </div>
-            <div className="flex justify-center gap-4 pb-6">
-              <button className="p-2 rounded-full hover:bg-gray-800 transition">
-                <SearchIcon className="text-gray-200" />
-              </button>
-              {isLoggedIn && (
-                <button className="p-2 rounded-full hover:bg-gray-800 transition">
-                  <NotificationsNoneOutlinedIcon className="text-gray-200" />
-                </button>
-              )}
-            </div>
+           
           </div>
         </div>
       )}

@@ -22,6 +22,7 @@ import VideoUploadPreview from './user/VideoUploadPreview';
 import Footer from './common/Navbar/Footer';
 import UserScreen from './common/Auth/UserProfile';
 import MovieDetailsScreen from './user/MovieDetailsScreen';
+import History from './User/History';
 // import MovieForm from './Admin/page/MovieCreateForm';
 // import VideoUploadPreview from './user/localuploderscreen';
 
@@ -74,9 +75,6 @@ function App() {
           <Route path='/' element={<Userpage>
             <HomeScreen/>
           </Userpage>} />
-          <Route path='/movie' element={<Userpage>
-            <MovieScreen/>
-          </Userpage>} />
           <Route path='/supports' element={<Userpage>
             <SupportScreen/>
           </Userpage>} />
@@ -89,8 +87,11 @@ function App() {
           <Route path='/userprofile' element={<Userpage>
             <UserScreen/>
           </Userpage>} />
-          <Route path='/moviedetails/:id' element={<Userpage>
+          <Route path='/watch' element={<Userpage>
             <MovieDetailsScreen/>
+          </Userpage>} />
+          <Route path='/history' element={<Userpage>
+            <History/>
           </Userpage>} />
         </Routes>
       </BrowserRouter>

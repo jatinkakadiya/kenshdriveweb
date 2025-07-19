@@ -89,6 +89,18 @@ export default function UserScreen() {
         {/* Profile Card */}
         <div className="w-full lg:w-1/3 flex flex-col">
           <div className="rounded-2xl overflow-hidden shadow-lg bg-[#232323] bg-opacity-95 backdrop-blur-md flex flex-col h-full">
+            {/* Admin Button (only for admin users) */}
+            {user.role === 'admin' && (
+              <div className="flex justify-end p-4">
+                <a
+                  href="/admin"
+                  className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition"
+                  style={{ fontSize: '1.1rem' }}
+                >
+                  Admin
+                </a>
+              </div>
+            )}
             <div className="relative">
               <div className="w-full h-[140px] bg-gradient-to-r from-red-700 to-pink-300"></div>
               <div className="flex justify-center -mt-[70px]">

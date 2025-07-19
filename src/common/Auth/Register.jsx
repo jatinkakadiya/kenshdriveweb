@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -30,7 +30,16 @@ const RegisterForm = () => {
   const [phone, setPhone] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [referral, setReferral] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) {
+      setReferral(ref);
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,8 +68,8 @@ const RegisterForm = () => {
         name,
         email,
         password,
-        role:"user"
-
+        role:"user",
+        freeTrial: referral // send referral code as freeTrial
       };
 
       const result = await Apihelper.Register(data);
@@ -81,7 +90,7 @@ const RegisterForm = () => {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
+        minHeight: '80vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -266,6 +275,27 @@ const RegisterForm = () => {
               }}
             />
 
+            {/* Referral Code Field */}
+            <TextField
+              margin="normal"
+              fullWidth
+              id="referral"
+              label="Referral Code (optional)"
+              name="referral"
+              autoComplete="off"
+              value={referral}
+              onChange={e => setReferral(e.target.value)}
+              InputProps={{
+                sx: { color: "white" }
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#333" },
+                  "&:hover fieldset": { borderColor: "red" }
+                },
+              }}
+            />
+
             <Button
               type="submit"
               fullWidth
@@ -297,6 +327,15 @@ const RegisterForm = () => {
                 "Register"
               )}
             </Button>
+
+            {/* 7 Day Free Trial Message */}
+            <Box sx={{ textAlign: 'center', mb: 2 }}>
+              <Typography variant="body1" sx={{ color: 'white', fontWeight: 500 }}>
+                <span style={{ verticalAlign: 'middle', marginRight: 6, color: 'red' }}>ⓘ</span>
+                Register now and get
+                <span style={{ color: 'red', fontWeight: 'bold', marginLeft: 6 }}>7 days free trial!</span>
+              </Typography>
+            </Box>
 
             <Box sx={{ textAlign: 'center' }}>
               <Link
