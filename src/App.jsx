@@ -21,7 +21,7 @@ import VideoUploadPreview from './user/VideoUploadPreview';
 import Footer from './common/Navbar/Footer';
 import UserScreen from './common/Auth/UserProfile';
 import MovieDetailsScreen from './user/MovieDetailsScreen';
-import Historys from './User/History';
+import Historys from './common/Navbar/History';
 // import MovieForm from './Admin/page/MovieCreateForm';
 // import VideoUploadPreview from './user/localuploderscreen';
 
