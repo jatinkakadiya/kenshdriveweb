@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 const plansData = {
     monthly: [
@@ -136,24 +136,9 @@ export default function SubscriptionsScreen() {
             </div>
             <div className="mt-6">
                 {/* Show message and input only once above all cards */}
-                <div className="mb-4 text-red-600 font-semibold text-center">
-                    Add a link to get 7 days free on the Basic plan.
-                </div>
+              
                 <div className="w-full mb-6">
-                    <div className="flex flex-col sm:flex-row gap-3 mx-auto w-full sm:max-w-lg">
-                        <input
-                            type="text"
-                            className="w-full sm:flex-1 py-2 px-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500
-                 text-white placeholder:text-white bg-transparent"
-                            placeholder="Enter link"
-                        />
-                        <button
-                            className="w-full sm:w-auto bg-red-600 text-white rounded-lg px-6 py-2 font-semibold hover:bg-red-700 transition-colors"
-                            type="button"
-                        >
-                            Submit
-                        </button>
-                    </div>
+                  x
                 </div>
                 <div className="flex flex-col md:flex-row md:space-x-6 gap-6">
                     {plans.map((plan, index) => (

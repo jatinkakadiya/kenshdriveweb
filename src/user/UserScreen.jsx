@@ -167,6 +167,17 @@ export default function UserScreen() {
               </div>
             </div>
           </div>
+          {/* Go to Dashboard Button (only for admin users) */}
+          {user.role === 'admin' && (
+            <div className="flex justify-center mt-6">
+              <a
+                href="/admin/dashboard"
+                className="bg-red-700 hover:bg-red-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition text-lg"
+              >
+                Go to Dashboard
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Account Settings */}

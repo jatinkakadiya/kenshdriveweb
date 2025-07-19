@@ -93,12 +93,11 @@ export default function Header() {
           <div className="hidden md:block bg-[#18181b] rounded-lg px-4 py-2">
             <div className="flex gap-2">
               {[
-                { path: Path.home, label: 'Home' },
-                { path: Path.movie, label: 'CloudStorege' },
-
-                { path: Path.supports, label: 'Supports' },
-                { path: Path.subscription, label: 'More' },
-                { path: Path.history, label: 'History' },
+                 { path: Path.home, label: 'Home' },
+                 { path: Path.movie, label: 'Video player' },
+                 // { path: Path.supports, label: 'Supports' },
+                 { path: Path.subscription, label: 'More' },
+                 { path: Path.history, label: 'Recent ' },
                 // { path: '/video-upload', label: 'Video Upload' }
               ].map(({ path, label }) => (
                 <button
@@ -154,10 +153,10 @@ export default function Header() {
             <div className="p-6 flex flex-col gap-2">
               {[
                 { path: Path.home, label: 'Home' },
-                { path: Path.movie, label: 'CloudStorege' },
-                { path: Path.supports, label: 'Supports' },
+                { path: Path.movie, label: 'Video player' },
+                // { path: Path.supports, label: 'Supports' },
                 { path: Path.subscription, label: 'More' },
-                { path: Path.history, label: 'History' },
+                { path: Path.history, label: 'Recent ' },
                 // { path: '/video-upload', label: 'Video Upload' }
               ].map(({ path, label }) => (
                 <button
