@@ -156,7 +156,7 @@ const MoviesList = () => {
                         {movie?.qualities["720p"] && typeof movie.qualities["720p"] === 'string' ? (
                           <>
                             {(() => {
-                              const fullLink = `http://localhost:5173/watch?video=${movie.qualities["720p"]}`;
+                              const fullLink = `kenshdriveweb-3s8f.vercel.app/watch?video=${movie.qualities["720p"]}`;
                               const shortLink = fullLink.length > 30 ? `${fullLink.slice(0, 18)}...${fullLink.slice(-8)}` : fullLink;
                               return (
                                 <>
@@ -186,7 +186,7 @@ const MoviesList = () => {
                         {movie?.qualities["1080p"] && typeof movie.qualities["1080p"] === 'string' ? (
                           <>
                             {(() => {
-                              const fullLink = `http://localhost:5173/watch?video=${movie.qualities["1080p"]}`;
+                              const fullLink = `kenshdriveweb-3s8f.vercel.app/watch?video=${movie.qualities["1080p"]}`;
                               const shortLink = fullLink.length > 30 ? `${fullLink.slice(0, 18)}...${fullLink.slice(-8)}` : fullLink;
                               return (
                                 <>
