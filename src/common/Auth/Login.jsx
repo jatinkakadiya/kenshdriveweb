@@ -95,6 +95,18 @@ const LoginForm = () => {
               fontWeight: "bold"
             }}
           >
+            Wellcome to Kensdrive
+          </Typography>
+          <Typography
+            component="h1"
+            variant="h5"
+            sx={{
+              color: "white",
+              mb: 3,
+              textAlign: "center",
+              fontWeight: "bold"
+            }}
+          >
             LOGIN
           </Typography>
 

@@ -1,16 +1,18 @@
 import React, { useRef, useState } from 'react';
 import { FaLock, FaExpand, FaCompress } from 'react-icons/fa';
 import { FaUnlock } from "react-icons/fa6";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 
 export default function MovieDetailsScreen() {
   const [locked, setLocked] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
   const videoRef = useRef(null);
   const containerRef = useRef(null);
+  const navigate = useNavigate();
 const url = useParams()
-console.log(url)
   // Dummy movie details for demonstration
   const movieDetails = {
     name: 'Movie Name',
@@ -51,7 +53,6 @@ console.log(url)
       }
     }
   };
-
   React.useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -62,10 +63,33 @@ console.log(url)
     };
   }, []);
 
+  React.useEffect(() => {
+    // Premium check logic
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const user = JSON.parse(atob(token.split('.')[1]));
+        setIsPremium(!!user.isPremium);
+      }
+    } catch {}
+  }, []);
+
+  React.useEffect(() => {
+    if (!isPremium && videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+      const timer = setTimeout(() => {
+        videoRef.current.pause();
+        setShowPopup(true);
+      }, 15000);
+      return () => clearTimeout(timer);
+    }
+  }, [isPremium, videoUrl]);
+
   return (
     <div
       ref={containerRef}
-      className="overflow-hidden relative w-[100%] h-screen overflow-hidden bg-black flex flex-col justify-center items-center"
+      className=" relative w-[100%] h-screen overflow-hidden bg-black flex flex-col justify-center items-center"
       style={{ padding: 0, margin: 0 }}
     >
       {/* Movie Name */}
@@ -77,9 +101,27 @@ console.log(url)
           className="w-full h-full object-cover"
           controls={!locked}
               autoPlay
-          controlsList="nofullscreen"
+         controlsList={isPremium ? "nofullscreen download" : "nofullscreen nodownload"}
           // style={{ minHeight: '100vh', minWidth: '100vw', background: 'black' }}
         />
+        {/* Popup for non-premium users after 15s */}
+        {showPopup && !isPremium && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+            <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+              <h2 className="text-xl font-bold mb-4 text-red-600">Upgrade Required</h2>
+              <p className="mb-6 text-gray-800">This is a preview. Please upgrade to premium to watch the full video.</p>
+              <button
+                className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 font-semibold"
+                onClick={() => {
+                  setShowPopup(false);
+                  navigate('/subscription');
+                }}
+              >
+                Go to subscription
+              </button>
+            </div>
+          </div>
+        )}
         {/* Center Lock Button (only when locked) */}
         {locked && (
           <button

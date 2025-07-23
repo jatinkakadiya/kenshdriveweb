@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material';
 import { Snackbar, Alert, Avatar, Divider } from '@mui/material';
 import { Apihelper } from '../service/ApiHelper';
+import { Link } from 'react-router-dom';
 
 export default function UserScreen() {
   const [user, setUser] = useState({
@@ -91,7 +92,16 @@ export default function UserScreen() {
                   </p>
                 </div>
               </div>
-             
+              {user.role === 'admin' && (
+                <div className="flex justify-center mt-6">
+                  <Link
+                    to="/admin"
+                    className="bg-red-700 hover:bg-red-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition text-lg"
+                  >
+                    Go to Dashboard
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
 

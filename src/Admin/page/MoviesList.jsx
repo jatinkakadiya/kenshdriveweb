@@ -14,6 +14,8 @@ import {
   Modal,
   Dialog,
   DialogContent,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Movie,
@@ -25,19 +27,18 @@ import {
 import MovieCreateForm from './MovieCreateForm';
 import { Apihelper } from '../../common/service/ApiHelper';
 import { useEffect } from 'react';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 // Sample data - replace with your actual data
-const sampleMovies = [
-  { id: 1, title: "The Last Warrior", views: "1.2M", rating: 8.2, duration: "2h 15m", category: "Action", language: "English", isPremium: true },
-  { id: 2, title: "Midnight City", views: "890K", rating: 7.6, duration: "1h 52m", category: "Thriller", language: "Hindi", isPremium: false },
-  { id: 3, title: "Space Odyssey", views: "1.5M", rating: 8.8, duration: "2h 28m", category: "Sci-Fi", language: "English", isPremium: true },
-  { id: 4, title: "Lost Treasure", views: "760K", rating: 7.1, duration: "1h 45m", category: "Adventure", language: "Hindi", isPremium: false },
-  { id: 5, title: "Dark Forest", views: "1.1M", rating: 8.0, duration: "2h 05m", category: "Horror", language: "English", isPremium: true },
-];
+
 
 const MoviesList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [movies, setMovies] = useState(sampleMovies);
+  const [movies, setMovies] = useState([]);
+  const [copied, setCopied] = useState({});
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
 
   const handleOpenModal = () => {
@@ -56,6 +57,12 @@ const MoviesList = () => {
       console.log(error)
     }
     console.log(id)
+  };
+
+  const handleCopy = (movieId, quality, url) => {
+    navigator.clipboard.writeText(url);
+    setCopied({ [`${movieId}_${quality}`]: true });
+    setTimeout(() => setCopied({}), 1200);
   };
 
   async function ListMovis(params) {
@@ -78,13 +85,17 @@ const MoviesList = () => {
     <Box sx={{ bgcolor: 'black', minHeight: '100vh', py: 4 }}>
       <Box sx={{ maxWidth: '1400px', mx: 'auto', px: 3 }}>
         {/* Header */}
-        <Box sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 4
-        }}>
-          <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'space-between',
+            alignItems: { xs: 'stretch', sm: 'center' },
+            gap: 2,
+            mb: 4
+          }}
+        >
+          <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold', mb: { xs: 2, sm: 0 } }}>
             Movies List
           </Typography>
           <Button
@@ -95,7 +106,8 @@ const MoviesList = () => {
               bgcolor: 'red',
               '&:hover': { bgcolor: 'darkred' },
               textTransform: 'none',
-              px: 3
+              px: 3,
+              width: { xs: '100%', sm: 'auto' }
             }}
           >
             Add New Movie
@@ -103,69 +115,119 @@ const MoviesList = () => {
         </Box>
 
         {/* Movies Table */}
-        <Paper sx={{ bgcolor: '#111', borderRadius: 2, overflow: 'hidden' }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold' }}>Movie</TableCell>
-                  <TableCell align="right" sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold' }}>Views</TableCell>
-                  <TableCell align="right" sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold' }}>Rating</TableCell>
-                  <TableCell align="center" sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold' }}>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {movies.map((movie) => (
-                  <TableRow
-                    key={movie._id || movie.id}
-                    sx={{
-                      '&:last-child td': { borderBottom: 0 },
-                      '&:hover': { bgcolor: '#1E1E1E' }
-                    }}
-                  >
-                    <TableCell sx={{ color: 'white', borderColor: '#333' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Movie sx={{ color: 'red', mr: 1 }} />
-                        <Box>
-                          <Typography variant="body1">
-                            {movie.name}
-                          </Typography>
-                          {movie.isPremium && (
-                            <Typography variant="caption" sx={{ color: 'gold' }}>
-                              Premium
-                            </Typography>
-                          )}
-                        </Box>
-                      </Box>
-                    </TableCell>
-                    {/* <TableCell sx={{ color: 'white', borderColor: '#333' }}>{movie.category}</TableCell> */}
-                    <TableCell align="right" sx={{ color: 'white', borderColor: '#333' }}>{movie.views}</TableCell>
-                    <TableCell align="right" sx={{ color: 'white', borderColor: '#333' }}>
-                      <Box sx={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        bgcolor: movie.rating >= 8 ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 152, 0, 0.2)',
-                        px: 1,
-                        borderRadius: 1
-                      }}>
-                        {movie.ratings}/10
-                      </Box>
-                    </TableCell>
-                    <TableCell align="center" sx={{ borderColor: '#333' }}>
-                      <IconButton
-                        size="small"
-                        sx={{ color: 'error.main' }}
-                        onClick={() => handleDeleteMovie(movie._id)}
-                      >
-                        <Delete sx={{ color: '#f44336' }} />
-                      </IconButton>
-                    </TableCell>
+        <Box sx={{ width: '100%', overflowX: 'auto', mb: 3 }}>
+          <Paper sx={{ bgcolor: '#111', borderRadius: 2, minWidth: 600 }}>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold', px: { xs: 1, sm: 2 }, py: { xs: 1, sm: 2 }, fontSize: { xs: 12, sm: 14 } }}>Movie</TableCell>
+                    <TableCell align="right" sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold', px: { xs: 1, sm: 2 }, py: { xs: 1, sm: 2 }, fontSize: { xs: 12, sm: 14 } }}>720</TableCell>
+                    <TableCell align="right" sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold', px: { xs: 1, sm: 2 }, py: { xs: 1, sm: 2 }, fontSize: { xs: 12, sm: 14 } }}>1080</TableCell>
+                    <TableCell align="center" sx={{ color: '#999', borderColor: '#333', fontWeight: 'bold', px: { xs: 1, sm: 2 }, py: { xs: 1, sm: 2 }, fontSize: { xs: 12, sm: 14 } }}>Actions</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+                </TableHead>
+                <TableBody>
+                  {[...movies].sort((a, b) => (a.name || '').localeCompare(b.name || '')).map((movie) => (
+                    <TableRow
+                      key={movie._id || movie.id}
+                      sx={{
+                        '&:last-child td': { borderBottom: 0 },
+                        '&:hover': { bgcolor: '#1E1E1E' }
+                      }}
+                    >
+                      <TableCell sx={{ color: 'white', borderColor: '#333', px: { xs: 1, sm: 2 }, py: { xs: 1, sm: 2 }, fontSize: { xs: 12, sm: 14 } }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Movie sx={{ color: 'red', mr: 1, fontSize: { xs: 18, sm: 24 } }} />
+                          <Box>
+                            <Typography variant="body2" sx={{ fontSize: { xs: 13, sm: 16 } }}>
+                              {movie.name}
+                            </Typography>
+                            {movie.isPremium && (
+                              <Typography variant="caption" sx={{ color: 'gold' }}>
+                                Premium
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+                      </TableCell>
+                      {/* 720p link */}
+                      <TableCell align="right" sx={{ color: 'white', borderColor: '#333', px: { xs: 1, sm: 2 }, py: { xs: 1, sm: 2 }, fontSize: { xs: 12, sm: 14 } }}>
+                        {movie?.qualities["720p"] && typeof movie.qualities["720p"] === 'string' ? (
+                          <>
+                            {(() => {
+                              const fullLink = `http://localhost:5173/watch?video=${movie.qualities["720p"]}`;
+                              const shortLink = fullLink.length > 30 ? `${fullLink.slice(0, 18)}...${fullLink.slice(-8)}` : fullLink;
+                              return (
+                                <>
+                                  <a href={fullLink} target="_blank" rel="noopener noreferrer" style={{ color: '#4FC3F7', textDecoration: 'underline', wordBreak: 'break-all', fontSize: 12 }}>
+                                    {shortLink}
+                                  </a>
+                                  <button
+                                    style={{ marginLeft: 6, background: 'none', border: '1px solid #4FC3F7', borderRadius: 4, cursor: 'pointer', color: '#4FC3F7', padding: '1px 4px', fontSize: 11 }}
+                                    title="Copy link"
+                                    onClick={() => handleCopy(movie._id || movie.id, '720p', fullLink)}
+                                  >
+                                    Copy
+                                  </button>
+                                  {copied[`${movie._id || movie.id}_720p`] && (
+                                    <span style={{ color: '#4FC3F7', marginLeft: 3, fontSize: 11 }}>Copied!</span>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </>
+                        ) : (
+                          <span style={{ fontSize: 12 }}>{movie?.qualities["720p"] || '-'}</span>
+                        )}
+                      </TableCell>
+                      {/* 1080p link */}
+                      <TableCell align="right" sx={{ color: 'white', borderColor: '#333', px: { xs: 1, sm: 2 }, py: { xs: 1, sm: 2 }, fontSize: { xs: 12, sm: 14 } }}>
+                        {movie?.qualities["1080p"] && typeof movie.qualities["1080p"] === 'string' ? (
+                          <>
+                            {(() => {
+                              const fullLink = `http://localhost:5173/watch?video=${movie.qualities["1080p"]}`;
+                              const shortLink = fullLink.length > 30 ? `${fullLink.slice(0, 18)}...${fullLink.slice(-8)}` : fullLink;
+                              return (
+                                <>
+                                  <a href={fullLink} target="_blank" rel="noopener noreferrer" style={{ color: '#4FC3F7', textDecoration: 'underline', wordBreak: 'break-all', fontSize: 12 }}>
+                                    {shortLink}
+                                  </a>
+                                  <button
+                                    style={{ marginLeft: 6, background: 'none', border: '1px solid #4FC3F7', borderRadius: 4, cursor: 'pointer', color: '#4FC3F7', padding: '1px 4px', fontSize: 11 }}
+                                    title="Copy link"
+                                    onClick={() => handleCopy(movie._id || movie.id, '1080p', fullLink)}
+                                  >
+                                    Copy
+                                  </button>
+                                  {copied[`${movie._id || movie.id}_1080p`] && (
+                                    <span style={{ color: '#4FC3F7', marginLeft: 3, fontSize: 11 }}>Copied!</span>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </>
+                        ) : (
+                          <span style={{ fontSize: 12 }}>{movie?.qualities["1080p"] || '-'}</span>
+                        )}
+                      </TableCell>
+                    
+                      <TableCell align="center" sx={{ borderColor: '#333', px: { xs: 1, sm: 2 }, py: { xs: 1, sm: 2 }, fontSize: { xs: 12, sm: 14 } }}>
+                        <IconButton
+                          size="small"
+                          sx={{ color: 'error.main' }}
+                          onClick={() => handleDeleteMovie(movie._id)}
+                        >
+                          <Delete sx={{ color: '#f44336', fontSize: { xs: 18, sm: 24 } }} />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </Box>
 
         {/* Create Movie Modal */}
         <Dialog
@@ -198,7 +260,7 @@ const MoviesList = () => {
               >
                 <CloseIcon />
               </IconButton>
-              <MovieCreateForm />
+              <MovieCreateForm handleCloseModal={handleCloseModal}  />
             </Box>
           </DialogContent>
         </Dialog>

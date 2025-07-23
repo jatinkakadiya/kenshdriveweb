@@ -87,12 +87,12 @@ export default function DashboardLayout({ children }) {
                                 Order
                             </Link>
                         </li>
-                        <li className={getNavLinkClass("/trials")} onClick={() => setSidebarOpen(false)}>
+                        {/* <li className={getNavLinkClass("/trials")} onClick={() => setSidebarOpen(false)}>
                             <Link to="/trials" className="flex items-center px-3 py-2 rounded hover:bg-stone-200 text-sm font-medium tracking-wide uppercase">
                                 <VideoLibraryIcon className="mr-3" fontSize="small" />
                                 Trials
                             </Link>
-                        </li>
+                        </li> */}
                         <li className="ms-3 m-2">
                             <button
                                 onClick={() => {

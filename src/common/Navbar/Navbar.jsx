@@ -14,6 +14,7 @@ export default function Header() {
   const [isSticky, setIsSticky] = useState(false);
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const isHome = location.pathname === Path.home; // e.g., "/"
 
@@ -35,6 +36,7 @@ export default function Header() {
 
   useEffect(() => {
     const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
       if (window.innerWidth > 768) setOpen(false);
     };
     window.addEventListener('resize', handleResize);
@@ -140,9 +142,19 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Offcanvas */}
-      {open && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex flex-col justify-between animate-fade-in">
+      {/* Drawer and Overlay only on mobile */}
+      {open && isMobile && (
+        <>
+          {/* Overlay */}
+          <div
+            className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 block`}
+            onClick={() => setOpen(false)}
+          />
+          {/* Drawer */}
+          <div
+            className={`fixed top-0 right-0 h-screen w-3/4 max-w-xs z-50 bg-black shadow-lg flex flex-col justify-between transform transition-transform duration-300 translate-x-0`}
+            style={{ minWidth: '260px' }}
+          >
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
             <h5 className="text-lg font-semibold text-white">Menu</h5>
             <button type="button" className="text-gray-400 hover:text-white text-2xl" onClick={() => setOpen(false)}>
@@ -161,7 +173,7 @@ export default function Header() {
               ].map(({ path, label }) => (
                 <button
                   key={label}
-                  onClick={() => navigate(path)}
+                    onClick={() => { setOpen(false); navigate(path); }}
                   className={`w-full text-left px-4 py-2 rounded-lg font-medium transition ${
                     location.pathname === path ? 'bg-gray-900 text-white' : 'bg-[#18181b] text-gray-200 hover:bg-gray-800'
                   }`}
@@ -172,7 +184,7 @@ export default function Header() {
 
               {isLoggedIn ? (
                 <button
-                  onClick={handleLogout}
+                    onClick={() => { setOpen(false); handleLogout(); }}
                   className="w-full text-left px-4 py-2 rounded-lg font-medium bg-red-600 text-white hover:bg-red-700 transition mt-2"
                 >
                   <span className="inline-flex items-center gap-2">
@@ -181,7 +193,7 @@ export default function Header() {
                 </button>
               ) : (
                 <button
-                  onClick={() => navigate('/login')}
+                    onClick={() => { setOpen(false); navigate('/login'); }}
                   className="w-full text-left px-4 py-2 rounded-lg font-medium bg-red-600 text-white hover:bg-red-700 transition mt-2"
                 >
                   <span className="inline-flex items-center gap-2">
@@ -190,9 +202,9 @@ export default function Header() {
                 </button>
               )}
             </div>
-           
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

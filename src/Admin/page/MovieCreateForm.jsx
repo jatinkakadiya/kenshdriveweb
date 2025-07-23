@@ -3,7 +3,7 @@ import { Apihelper } from "../../common/service/ApiHelper";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const MovieCreateForm = () => {
+const MovieCreateForm = ({handleCloseModal}) => {
   const [form, setForm] = useState({
     name: '',
     image: [], // array of files
@@ -76,6 +76,7 @@ const MovieCreateForm = () => {
         draggable: true,
         progress: undefined,
       });
+      handleCloseModal()
     } finally {
       setIsLoading(false);
     }
@@ -249,7 +250,7 @@ const MovieCreateForm = () => {
                 disabled={isLoading}
                 className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                
+                createMovise
               </button>
             </div>
           </form>

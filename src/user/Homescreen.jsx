@@ -1,11 +1,15 @@
 import React, { useState, useRef } from 'react';
+import { FaCompress, FaExpand, FaLock, FaUnlock } from 'react-icons/fa';
 
 export default function HomeScreen() {
   const [videoFile, setVideoFile] = useState(null);
   const [videoURL, setVideoURL] = useState(null);
   const [urlInput, setUrlInput] = useState('');
   const [showOverlay, setShowOverlay] = useState(false);
+  const [locked, setLocked] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const inputRef = useRef(null);
+  const containerRef = useRef(null);
 
   const LOCAL_STORAGE_KEY = 'videoHistory';
 
@@ -55,6 +59,40 @@ export default function HomeScreen() {
     setVideoURL(null);
   };
 
+  const handleFullscreen = () => {
+    if (!isFullscreen) {
+      if (containerRef.current.requestFullscreen) {
+        containerRef.current.requestFullscreen();
+      } else if (containerRef.current.webkitRequestFullscreen) {
+        containerRef.current.webkitRequestFullscreen();
+      } else if (containerRef.current.mozRequestFullScreen) {
+        containerRef.current.mozRequestFullScreen();
+      } else if (containerRef.current.msRequestFullscreen) {
+        containerRef.current.msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center py-6 px-2 sm:px-4 md:px-0 gap-6">
       {/* Local Video Gallery Card */}
@@ -87,11 +125,11 @@ export default function HomeScreen() {
             placeholder="Paste video URL (mp4, webm, etc)"
             value={urlInput}
             onChange={e => setUrlInput(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 bg-black text-white text-sm sm:text-base"
+            className="flex-1 px-3 py-2 border border-red-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 bg-black text-white text-sm sm:text-base"
           />
           <button
             onClick={handleUrlAdd}
-            className="w-full sm:w-auto px-4 py-2  bg-red-600 hover:bg-red-7000 text-white rounded-lg font-semibold text-sm sm:text-base mt-2 sm:mt-0 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-sm sm:text-base mt-2 sm:mt-0 flex items-center justify-center gap-2"
             type="button"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -103,23 +141,65 @@ export default function HomeScreen() {
       </div>
       {/* Fullscreen Video Overlay */}
       {showOverlay && videoURL && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90">
+        <div 
+          className="fixed inset-0 z-100 flex items-center justify-center bg-black bg-opacity-90 overflow-hidden"
+          ref={containerRef}
+        >
           <button
             onClick={handleCloseOverlay}
-            className="absolute top-4 right-4 text-white text-3xl font-bold bg-black/60 rounded-full p-2  transition"
+            className="absolute top-4 z-30 right-4 text-white text-3xl font-bold bg-black/60 rounded-full p-2 transition cursor-pointer"
             title="Close"
           >
             &times;
           </button>
+          
           <video
             src={videoURL}
-            controls
+            className="w-full h-full rounded-lg shadow-lg border border-gray-700"
+            controls={!locked}
             autoPlay
-            className="w-full max-w-2xl max-h-[80vh] rounded-lg shadow-lg border border-gray-700"
-            style={{ background: 'black' }}
+            controlsList="nodownload nofullscreen"
+          />
+          
+          {/* Center Lock Button (only when locked) */}
+          {locked && (
+            <button
+              onClick={() => setLocked(false)}
+              className="absolute z-40 flex items-center justify-center top-[80%] left-[1%] bg-black/70 text-white p-2 rounded-full hover:bg-black/90 focus:outline-none"
+              title="Unlock"
+            >
+              <FaLock size={20} color="white" />
+            </button>
+          )}
+          
+          {/* Fullscreen Button */}
+          <button
+            onClick={handleFullscreen}
+            className="absolute top-[80%] left-16 bg-black/70 text-white p-2 rounded-full hover:bg-black/90 focus:outline-none z-40 cursor-pointer"
+            title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
           >
-            Your browser does not support the video tag.
-          </video>
+            {isFullscreen ? <FaCompress size={20} /> : <FaExpand size={20} />}
+          </button>
+          
+          {/* Lock Button (only when unlocked) */}
+          {!locked && (
+            <button
+              onClick={() => setLocked(true)}
+              className="absolute top-[80%] left-[1%] bg-black/70 text-white p-2 rounded-full hover:bg-black/90 focus:outline-none z-10"
+              title="Lock"
+            >
+              <FaUnlock size={20} color="silver" />
+            </button>
+          )}
+          
+          {/* Overlay to block interaction when locked */}
+          {locked && (
+            <div
+              className="absolute inset-0 z-30"
+              style={{ pointerEvents: 'auto', background: 'transparent' }}
+              onClick={e => e.stopPropagation()}
+            ></div>
+          )}
         </div>
       )}
     </div>

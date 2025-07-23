@@ -1,59 +1,8 @@
-import React, { useState } from 'react';
-
-// Static premium plans data for testing
-const staticPlans = [
-  {
-    _id: '1',
-    name: 'Monthly',
-    price: 199,
-    durationInDays: 30,
-    features: {
-      fullMovieAccess: true,
-      adFree: true,
-      hdStreaming: true,
-      earlyAccess: false,
-      downloadsAllowed: false,
-      maxDevices: 1,
-    },
-    isActive: true,
-    createdAt: new Date('2023-12-01')
-  },
-  {
-    _id: '2',
-    name: 'Yearly',
-    price: 1999,
-    durationInDays: 365,
-    features: {
-      fullMovieAccess: true,
-      adFree: true,
-      hdStreaming: true,
-      earlyAccess: true,
-      downloadsAllowed: true,
-      maxDevices: 3,
-    },
-    isActive: true,
-    createdAt: new Date('2023-12-01')
-  },
-  {
-    _id: '3',
-    name: 'Ultimate',
-    price: 2999,
-    durationInDays: 365,
-    features: {
-      fullMovieAccess: true,
-      adFree: true,
-      hdStreaming: true,
-      earlyAccess: true,
-      downloadsAllowed: true,
-      maxDevices: 5,
-    },
-    isActive: true,
-    createdAt: new Date('2023-12-01')
-  }
-];
+import React, { useState, useEffect } from 'react';
+import { Apihelper } from '../../common/service/ApiHelper';
 
 const PremiumPlans = () => {
-  const [plans, setPlans] = useState(staticPlans);
+  const [plans, setPlans] = useState([]);
   const [editingPlan, setEditingPlan] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -70,6 +19,18 @@ const PremiumPlans = () => {
     isActive: true
   });
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    async function fetchPlans() {
+      try {
+        const res = await Apihelper.Listplan();
+        setPlans(res.data.data || []);
+      } catch (error) {
+        console.error('Failed to fetch premium plans:', error);
+      }
+    }
+    fetchPlans();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -110,26 +71,33 @@ const PremiumPlans = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     if (editingPlan) {
-      // Update existing plan
-      setPlans(plans.map(plan => 
-        plan._id === editingPlan._id 
-          ? { ...formData, _id: plan._id, createdAt: plan.createdAt }
-          : plan
-      ));
+      // Log the data and _id being sent to the API
+      console.log('Editing plan:', editingPlan._id, formData);
+      // Update existing plan via API
+      try {
+        await Apihelper.editPlan(editingPlan._id, formData);
+        // Refresh plans from API
+        const res = await Apihelper.Listplan();
+        setPlans(res.data.data || []);
+      } catch (error) {
+        console.error('Failed to update premium plan:', error);
+      }
       setEditingPlan(null);
     } else {
-      // Add new plan
-      const newPlan = {
-        ...formData,
-        _id: 'p' + (plans.length + 1),
-        createdAt: new Date()
-      };
-      setPlans([...plans, newPlan]);
+      // Add new plan via API
+      try {
+        await Apihelper.createplan(formData);
+        // Refresh plans from API
+        const res = await Apihelper.Listplan();
+        setPlans(res.data.data || []);
+      } catch (error) {
+        console.error('Failed to create premium plan:', error);
+      }
     }
 
     // Reset form
@@ -156,16 +124,20 @@ const PremiumPlans = () => {
       price: plan.price,
       durationInDays: plan.durationInDays,
       features: { ...plan.features },
-      isActive: plan.isActive
+      isActive: plan.isActive,
+      _id:plan._id
     });
   };
 
-  const handleToggleActive = (planId) => {
-    setPlans(plans.map(plan =>
-      plan._id === planId
-        ? { ...plan, isActive: !plan.isActive }
-        : plan
-    ));
+  const handleToggleActive = async (planId) => {
+    try {
+      await Apihelper.togalplan(planId);
+      // Refresh plans from API
+      const res = await Apihelper.Listplan();
+      setPlans(res.data.data || []);
+    } catch (error) {
+      console.error('Failed to toggle plan status:', error);
+    }
   };
 
   return (
@@ -191,8 +163,8 @@ const PremiumPlans = () => {
                   className={`w-full px-4 py-2 bg-black border ${errors.name ? 'border-red-500' : 'border-red-500/50'} rounded-md text-white focus:outline-none focus:ring-2 focus:ring-red-500`}
                 >
                   <option value="" className="bg-black text-white">Select Plan</option>
-                  <option value="Monthly" className="bg-black text-white">Monthly</option>
-                  <option value="Yearly" className="bg-black text-white">Yearly</option>
+                  <option value="monthly" className="bg-black text-white">Monthly</option>
+                  <option value="yearly" className="bg-black text-white">Yearly</option>
                   <option value="Ultimate" className="bg-black text-white">Ultimate</option>
                 </select>
                 {errors.name && <p className="mt-1 text-red-500 text-sm">{errors.name}</p>}

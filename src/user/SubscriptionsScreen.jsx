@@ -1,4 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Apihelper } from '../common/service/ApiHelper';
+import { useNavigate } from 'react-router-dom';
 
 const plansData = {
     monthly: [
@@ -95,6 +97,7 @@ const plansData = {
 
 export default function SubscriptionsScreen() {
     const [planType, setPlanType] = useState('monthly');
+    const [Plans, setPlans] = useState([]);
     const plans = plansData[planType];
     const [activeTab, setActiveTab] = useState(0); // Default to first tab
     const handlePlanTypeChange = (type) => {
@@ -106,7 +109,88 @@ export default function SubscriptionsScreen() {
         const savings = ((monthlyYearTotal - yearlyPrice) / monthlyYearTotal * 100).toFixed(0);
         return savings;
     };
+    async function listplan() {
+        try {
+            const res = await Apihelper.Activeplan()
+            setPlans(res.data.data)
+            console.log(res.data.data);
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
+    useEffect(() => {
+        listplan()
+    }, []);
+
+    const navigate = useNavigate();
+
+    // Razorpay payment handler
+    const handleRazorpay = async (plan) => {
+        let user = null;
+        let token = null;
+        try {
+          user = JSON.parse(localStorage.getItem("userinfo"));
+          token = localStorage.getItem("token");
+        } catch {
+          user = null;
+          token = null;
+        }
+      
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+      
+        try {
+          // ✅ Step 1: Create order from backend
+          const orderRes = await Apihelper.crearteorder({
+            userid: user?._id,
+            premiumType: plan.name,
+            price: plan.price,
+            days: plan.durationInDays,
+          });
+      
+          const order = orderRes.data.data.razorpayDetails;
+      
+          // ✅ Step 2: Razorpay checkout options
+          const options = {
+            key: "rzp_test_zGCQXPmnJfWXkO",
+            amount: order.amount,
+            currency: order.currency,
+            name: "KenshMovis",
+            description: `Subscribe to ${plan.name} plan`,
+            order_id: order.id, // Razorpay Order ID
+            handler: async function (response) {
+              try {
+                // ✅ Step 3: Call upgrade API
+                await Apihelper.upgradplan({
+                  type: plan.name,
+                  orderId: orderRes.data.data._id, // MongoDB doc ID
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  user: user,
+                });
+                alert("Payment and upgrade successful!");
+              } catch (err) {
+                alert("Payment succeeded but backend failed: " + err.message);
+              }
+            },
+            prefill: {
+              name: user?.name || "",
+              email: user?.email || "",
+              contact: user?.phone || "",
+            },
+            theme: { color: "#dc2626" },
+          };
+      
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+        } catch (error) {
+          alert("Order creation failed: " + error.message);
+        }
+      };
+      
     return (
         <div className="max-w-7xl mx-auto pt-10 px-4">
             <div className="mb-8"></div>
@@ -136,14 +220,14 @@ export default function SubscriptionsScreen() {
             </div>
             <div className="mt-6">
                 {/* Show message and input only once above all cards */}
-              
+
                 <div className="w-full mb-6">
-                  x
+                    x
                 </div>
                 <div className="flex flex-col md:flex-row md:space-x-6 gap-6">
-                    {plans.map((plan, index) => (
+                    {Plans.map((plan, index) => (
                         <div className="flex-1 mb-4 md:mb-0" key={index}>
-                            <div className={`relative bg-[#18181b] rounded-2xl p-6 h-full flex flex-col shadow-lg border border-gray-800 ${plan.tag ? 'ring-2 ring-red-500' : ''}`}>
+                            <div className={`relative bg-[#18181b] rounded-2xl p-6 h-full flex flex-col shadow-lg border border-gray-800 ${plan._id ? 'ring-2 ring-red-500' : ''}`}>
                                 {plan.tag && (
                                     <div className="absolute top-4 right-4">
                                         <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow">Most Popular</span>
@@ -159,44 +243,43 @@ export default function SubscriptionsScreen() {
                                             <span>{plan.price}</span>
                                             <span className="ml-1 text-base font-medium">/{planType}</span>
                                         </h2>
-                                        {planType === 'yearly' && (
+                                        {/* {planType === 'yearly' && (
                                             <div className="mt-2">
                                                 <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold">
                                                     Save {calculateSavings(plansData.monthly[index].price, plan.price)}%
                                                 </span>
                                             </div>
-                                        )}
+                                        )} */}
                                     </div>
                                     <p className="text-gray-200 text-sm">{plan.features.Content}</p>
                                 </div>
                                 <div className="mb-4 space-y-2">
-                                    <div className="flex items-center">
-                                        <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L6 13.25l1.41-1.41L9.75 14.17l6.84-6.84L18 8.75z" /></svg>
-                                        <span className="text-white">{plan.features.Devices}</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <svg className={`w-5 h-5 mr-2 ${plan.features.HDR === 'Yes' ? 'text-green-500' : 'text-red-500'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                            {plan.features.HDR === 'Yes' ? (
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                            ) : (
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                            )}
-                                        </svg>
-                                        <span className="text-white">HDR</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <svg className={`w-5 h-5 mr-2 ${plan.features['Ad- Free'] === 'Yes' ? 'text-green-500' : 'text-red-500'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                            {plan.features['Ad- Free'] === 'Yes' ? (
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                            ) : (
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                            )}
-                                        </svg>
-                                        <span className="text-white">Ad Free</span>
-                                    </div>
+                                    {/* Debug log for features */}
+
+                                    {plan.features && Object.entries(plan.features).length > 0 ? (
+                                        Object.entries(plan.features).map(([key, value], i) => (
+                                            <div className="flex items-center" key={i}>
+                                                <svg className={`w-5 h-5 mr-2 ${value === true ? 'text-green-500' : value === false ? 'text-red-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                                    {value === true ? (
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                    ) : value === false ? (
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                    ) : (
+                                                        <circle cx="12" cy="12" r="10" />
+                                                    )}
+                                                </svg>
+                                                <span className="text-white font-semibold mr-2">{key}:</span>
+                                                <span className="text-gray-200">{String(value)}</span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-gray-400">No features available</div>
+                                    )}
                                 </div>
                                 <div className="mt-auto">
-                                    <button className='bg-red-600 text-white w-full py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors'>
+                                    <button className='bg-red-600 text-white w-full py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors'
+                                        onClick={() => handleRazorpay(plan)}
+                                    >
                                         <span className="block mb-1">Choose {plan.name} Plan</span>
                                     </button>
                                 </div>
@@ -206,36 +289,7 @@ export default function SubscriptionsScreen() {
                 </div>
             </div>
             <div className="my-10"></div>
-            <div className="text-2xl font-bold text-white mb-2">Compare our plans and find the right one for you</div>
-            <p className="text-gray-300 mb-6">StreamVibe offers three different plans to fit your needs: Basic, Standard, and Premium. Compare the features of each plan and choose the one that's right for you.</p>
-            <div className="hidden md:block overflow-x-auto">
-                <table className="min-w-full text-center bg-[#18181b] rounded-xl overflow-hidden mb-10">
-                    <thead>
-                        <tr>
-                            <th className='text-left px-4 py-3 text-gray-200 text-base font-semibold'>Features</th>
-                            {plans.map((plan, idx) => (
-                                <th className='w-1/4 text-left px-4 py-3 text-gray-200 text-base font-semibold' key={idx}>
-                                    {plan.name}
-                                    {plan.tag && <span className="bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold ml-2">{plan.tag}</span>}
-                                    <div className="text-red-500 mt-1 font-semibold">
-                                        ₹{plan.price}/{planType}
-                                    </div>
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {Object.keys(plans[0].features).map((feature, i) => (
-                            <tr key={i} className="border-t border-gray-800">
-                                <td className='text-left px-4 py-2 text-gray-300'>{feature}</td>
-                                {plans.map((plan, idx) => (
-                                    <td className='text-left px-4 py-2 text-gray-100' key={idx}>{plan.features[feature]}</td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+
             {/* Mobile Tabs */}
             {/* <div className="block md:hidden mt-8">
                 <div className="bg-[#18181b] rounded-xl pt-1 mb-3">

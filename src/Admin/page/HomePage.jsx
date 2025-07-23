@@ -55,18 +55,9 @@ import {
 import { useState } from "react";
 import { useEffect } from "react";
 import { Apihelper } from "../../common/service/ApiHelper";
-import { all } from "axios";
 
 // Sample data
-const viewData = [
-    { name: "Jan", views: 4200, premium: 1200, },
-    { name: "Feb", views: 3800, premium: 1000, },
-    { name: "Mar", views: 5500, premium: 1800, },
-    { name: "Apr", views: 3100, premium: 900, },
-    { name: "May", views: 4800, premium: 1500, },
-    { name: "Jun", views: 5200, premium: 2000, },
-    { name: "Jul", views: 5200, premium: 2000, },
-];
+
 
 const revenueData = [
     { name: "Jan", revenue: 2800, },
@@ -77,31 +68,9 @@ const revenueData = [
     { name: "Jun", revenue: 6800, },
 ];
 
-const pieData = [
-    { name: "Action", value: 35 },
-    { name: "Comedy", value: 25 },
-    { name: "Drama", value: 20 },
-    { name: "Horror", value: 12 },
-    { name: "Sci-Fi", value: 8 },
-];
 
-const platformData = [
-    { platform: "Theater", users: 35 },
-    { platform: "Streaming", users: 45 },
-    { platform: "TV", users: 15 },
-    { platform: "Other", users: 5 },
-];
 
-const recentMovies = [
-    { id: 1, title: "The Last Warrior", views: "1.2M", rating: 8.2, duration: "2h 15m" },
-    { id: 2, title: "Midnight City", views: "890K", rating: 7.6, duration: "1h 52m" },
-    { id: 3, title: "Space Odyssey", views: "1.5M", rating: 8.8, duration: "2h 28m" },
-    { id: 4, title: "Lost Treasure", views: "760K", rating: 7.1, duration: "1h 45m" },
-    { id: 5, title: "Dark Forest", views: "1.1M", rating: 8.0, duration: "2h 05m" },
-];
 
-const COLORS = ["#FF0000", "#FF5733", "#FF8C00", "#FFC300", "#F9E79F"];
-const PLATFORM_COLORS = ["#FF0000", "#FF8C00", "#FFC300", "#F9E79F"];
 
 const AnalyticsCard = ({ icon, title, value, change, isIncrease, onClick }) => {
     const theme = useTheme();
@@ -163,27 +132,38 @@ const MovieAnalytics = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-    const [timeRange, setTimeRange] = React.useState('6months');
+    const [monthlytotal, setmonthlytotal] = React.useState(null);
     const [activeCard, setActiveCard] = React.useState(null);
 
     const [totelView, settotelView] = useState(null)
-    const [genrePopularity, setGenrePopularity] = useState(null)
-    const [revenumovise, setrevenumovise] = useState(null)
+    const [toteleprimum, settoteleprimum] = useState(null)
+    const [totelprofit, settotelprofit] = useState(null);
+    const [totelmovise, settotelmovise] = useState(null);
+    const [toteluser, settoteluser] = useState(null);
     async function fatchview() {
 
 
         try {
-            const [totelview, GenrePopularity,Revenumovise] = await Promise.all([
+            const [totelview, totelmonthycount, totelprimum, totelearnings, totelmovies, toteluser, monthlypremium] = await Promise.all([
                 Apihelper.totelView(),
-                Apihelper.genreview(),
-                Apihelper.revenumovise()
+                Apihelper.monthlytotal(),
+                Apihelper.premiumtypecounts(),
+                Apihelper.totelearnings(),
+                Apihelper.ListMovise(),
+                Apihelper.toteluser(),
+                Apihelper.monthlypremium()
+
             ])
-            if (totelview.status == 200 && GenrePopularity.status === 200) {
+
+
+            settoteleprimum(totelprimum.data)
+            setmonthlytotal(totelmonthycount.data)
+            settotelprofit(totelearnings.data)
+            settotelmovise(totelmovies.data.data.movies)
+            settoteluser(toteluser.data)
+            if (totelview.status == 200) {
                 // console.log(totelview.data)
                 settotelView(totelview.data)
-                setGenrePopularity(GenrePopularity.data)
-                setrevenumovise(Revenumovise.data)
-                console.log(Revenumovise.data)
             } else {
                 console.log("error")
             }
@@ -195,6 +175,8 @@ const MovieAnalytics = () => {
     useEffect(() => {
         fatchview()
     }, [])
+
+    console.log(toteleprimum)
 
     function formatNumber(num) {
         if (num >= 10000000) return (num / 10000000).toFixed(1) + 'Cr';
@@ -227,49 +209,45 @@ const MovieAnalytics = () => {
                 </Box>
 
                 {/* Stats Cards */}
-                <div className={`grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-4`}>
-
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 mb-4">
                     <div className="flex justify-center">
                         <AnalyticsCard
                             icon={<Movie className="text-red-600" />}
                             title="Total Movies"
-                            value="247"
-                            change="12%"
+                            value={formatNumber(totelmovise ? totelmovise.length : 0)}
                             isIncrease={true}
                             onClick={() => setActiveCard('movies')}
                         />
                     </div>
                     <div className="flex justify-center">
                         <AnalyticsCard
-                            icon={<Theaters className="text-red-600" />}
-                            title="Screenings"
-                            value="1,892"
-                            change="8%"
-                            isIncrease={true}
-                            onClick={() => setActiveCard('screenings')}
-                        />
-                    </div>
-                    <div className="flex justify-center">
-                        <AnalyticsCard
                             icon={<People className="text-red-600" />}
-                            title="Total Viewers"
-                            value={formatNumber(totelView ? totelView : 0)}
-                            change="5%"
-                            // isIncrease={false}
+                            title="Total users"
+                            value={formatNumber(toteluser ? toteluser.total : 0)}
                             onClick={() => setActiveCard('viewers')}
                         />
                     </div>
-
                     <div className="flex justify-center">
                         <AnalyticsCard
                             icon={<MonetizationOn className="text-red-600" />}
                             title="Revenue"
-                            value="$18.7M"
+                            value={"₹" + formatNumber(totelprofit ? totelprofit : 0)}
                             change="15%"
                             isIncrease={true}
                             onClick={() => setActiveCard('revenue')}
                         />
                     </div>
+                    {toteleprimum && toteleprimum.map((x, idx) => (
+                        <div className="flex justify-center" key={idx}>
+                            <AnalyticsCard
+                                icon={<MonetizationOn className="text-red-600" />}
+                                title={`${x.type.charAt(0).toUpperCase() + x.type.slice(1)} Premium`}
+                                value={x.count}
+                                isIncrease={true}
+                                onClick={() => setActiveCard('revenue')}
+                            />
+                        </div>
+                    ))}
                 </div>
 
 
@@ -279,14 +257,14 @@ const MovieAnalytics = () => {
                     {/* Monthly Views Chart */}
                     <div className="bg-[#111] p-3 md:p-5 h-full rounded-md">
                         <div className="flex justify-between items-center mb-2 md:mb-4">
-                            <h2 className="text-white text-base md:text-lg font-semibold">Monthly Views</h2>
+                            <h2 className="text-white text-base md:text-lg font-semibold">Monthly earnings</h2>
                             <button className="text-gray-400 p-1 md:p-2">
                                 <MoreVert fontSize={isMobile ? "small" : "medium"} />
                             </button>
                         </div>
                         <div className="w-full h-[250px] md:h-[350px]">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={viewData}>
+                                <BarChart data={monthlytotal}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                                     <XAxis dataKey="name" stroke="#999" />
                                     <YAxis stroke="#999" />
@@ -300,8 +278,7 @@ const MovieAnalytics = () => {
                                     {!isMobile && (
                                         <Legend wrapperStyle={{ color: '#999', paddingTop: '10px' }} />
                                     )}
-                                    <Bar dataKey="premium" fill="#FF0000" radius={[4, 4, 0, 0]} name="Premium" />
-                                    <Bar dataKey="standard" fill="#FF8C00" radius={[4, 4, 0, 0]} name="Standard" />
+                                    <Bar dataKey="premium" fill="#FF0000" radius={[4, 4, 0, 0]} name="earnings" />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
@@ -354,106 +331,6 @@ const MovieAnalytics = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Charts Row 2 */}
-              
-
-
-                {/* Movies Table */}
-                <Paper sx={{ p: isMobile ? 1 : 2, bgcolor: "#111" }}>
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        mb: isMobile ? 1 : 2,
-                        flexDirection: isMobile ? 'column' : 'row',
-                        gap: isMobile ? 1 : 0
-                    }}>
-                        <Typography variant={isMobile ? "subtitle1" : "h6"} sx={{ color: 'white' }}>
-                            Top Performing Movies
-                        </Typography>
-                        <Box sx={{
-                            display: 'flex',
-                            gap: 1,
-                            width: isMobile ? '100%' : 'auto'
-                        }}>
-                            <FormControl size="small" sx={{ minWidth: isMobile ? '100%' : 120 }}>
-                                <InputLabel sx={{ color: '#999' }}>Sort By</InputLabel>
-                                <Select
-                                    defaultValue="revenue"
-                                    sx={{
-                                        color: 'white',
-                                        '& .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: '#333'
-                                        },
-                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: '#555'
-                                        }
-                                    }}
-                                    label="Sort By"
-                                >
-                                    <MenuItem value="revenue">Revenue</MenuItem>
-                                    <MenuItem value="views">Views</MenuItem>
-                                    <MenuItem value="rating">Rating</MenuItem>
-                                </Select>
-                            </FormControl>
-                            {!isMobile && (
-                                <IconButton sx={{ color: '#999' }}>
-                                    <MoreVert />
-                                </IconButton>
-                            )}
-                        </Box>
-                    </Box>
-                    <TableContainer>
-                        <Table size={isMobile ? "small" : "medium"}>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell sx={{ color: '#999', borderColor: '#333' }}>Movie</TableCell>
-                                    {!isMobile && (
-                                        <TableCell align="right" sx={{ color: '#999', borderColor: '#333' }}>Duration</TableCell>
-                                    )}
-                                    <TableCell align="right" sx={{ color: '#999', borderColor: '#333' }}>Views</TableCell>
-                                    <TableCell align="right" sx={{ color: '#999', borderColor: '#333' }}>Rating</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {revenumovise?.map((movie) => (
-                                    <TableRow
-                                        key={movie._id}
-                                        sx={{
-                                            '&:last-child td': { borderBottom: 0 },
-                                            '&:hover': { bgcolor: '#1E1E1E' }
-                                        }}
-                                    >
-                                        <TableCell sx={{ color: 'white', borderColor: '#333' }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                <Movie sx={{ color: 'red', mr: 1, fontSize: isMobile ? "small" : "medium" }} />
-                                                <Typography variant={isMobile ? "body2" : "body1"}>
-                                                    {isMobile ? movie.name.split(' ').slice(0, 2).join(' ') + (movie.name.split(' ').length > 2 ? '...' : '') : movie.name}
-                                                </Typography>
-                                            </Box>
-                                        </TableCell>
-                                        {!isMobile && (
-                                            <TableCell align="right" sx={{ color: 'white', borderColor: '#333' }}>{movie.duration}</TableCell>
-                                        )}
-                                        <TableCell align="right" sx={{ color: 'white', borderColor: '#333' }}>{movie.views}</TableCell>
-                                        <TableCell align="right" sx={{ color: 'white', borderColor: '#333' }}>
-                                            <Box sx={{
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                bgcolor: movie.rating >= 8 ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 152, 0, 0.2)',
-                                                px: 1,
-                                                borderRadius: 1
-                                            }}>
-                                                {movie.rating}/5
-                                            </Box>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Paper>
             </Container>
         </Box>
     );

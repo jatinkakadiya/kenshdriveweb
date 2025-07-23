@@ -1,68 +1,34 @@
-import React, { useState } from 'react';
-
-// Static orders data for testing
-const staticOrders = [
-  {
-    _id: '1',
-    userid: {
-      _id: 'u1',
-      name: 'John Doe',
-      email: 'john@example.com'
-    },
-    premiumType: 'monthly',
-    price: 199,
-    paymentStatus: 'completed',
-    paymentId: 'pay_123456',
-    createdAt: new Date('2024-03-15'),
-    expiresAt: new Date('2024-04-15')
-  },
-  {
-    _id: '2',
-    userid: {
-      _id: 'u2',
-      name: 'Jane Smith',
-      email: 'jane@example.com'
-    },
-    premiumType: 'yearly',
-    price: 1999,
-    paymentStatus: 'pending',
-    paymentId: 'pay_789012',
-    createdAt: new Date('2024-03-14'),
-    expiresAt: new Date('2025-03-14')
-  },
-  {
-    _id: '3',
-    userid: {
-      _id: 'u3',
-      name: 'Mike Johnson',
-      email: 'mike@example.com'
-    },
-    premiumType: 'monthly',
-    price: 199,
-    paymentStatus: 'failed',
-    paymentId: 'pay_345678',
-    createdAt: new Date('2024-03-13'),
-    expiresAt: new Date('2024-04-13')
-  }
-];
-
+import React, { useEffect, useState } from 'react';
+import { Apihelper } from '../../common/service/ApiHelper';
 const Orders = () => {
-  const [orders, setOrders] = useState(staticOrders);
+  const [orders, setOrders] = useState([]); // Start with empty array
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
+  // Fetch orders from backend
+  async function Listorder() {
+    try {
+      const res = await Apihelper.Liastorder();
+      setOrders(res.data || []);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    Listorder();
+  }, []);
+
   // Filter orders based on search term and status
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
-      order.userid.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.userid.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.paymentId.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const user = order.userid || {};
+    const matchesSearch =
+      (user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || "") ||
+      (user.email?.toLowerCase().includes(searchTerm.toLowerCase()) || "") ||
+      (order.paymentId?.toLowerCase().includes(searchTerm.toLowerCase()) || "");
     const matchesStatus = statusFilter === 'all' || order.paymentStatus === statusFilter;
-    
     return matchesSearch && matchesStatus;
   });
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed':
@@ -124,35 +90,38 @@ const Orders = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.map((order) => (
-                  <tr 
-                    key={order._id}
-                    className="border-b border-red-500/10 hover:bg-red-500/5 transition-colors"
-                  >
-                    <td className="px-4 py-3">
-                      <div>
-                        <div className="font-medium">{order.userid.name}</div>
-                        <div className="text-sm text-gray-400">{order.userid.email}</div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 capitalize">{order.premiumType}</td>
-                    <td className="px-4 py-3">₹{order.price}</td>
-                    <td className="px-4 py-3">
-                      <span className="text-sm font-mono">{order.paymentId}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.paymentStatus)} bg-opacity-20 text-white`}>
-                        {order.paymentStatus}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3">
-                      {new Date(order.expiresAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
+                {filteredOrders.map((order) => {
+                  const user = order.userid || {};
+                  return (
+                    <tr 
+                      key={order._id}
+                      className="border-b border-red-500/10 hover:bg-red-500/5 transition-colors"
+                    >
+                      <td className="px-4 py-3">
+                        <div>
+                          <div className="font-medium">{user.name || '-'}</div>
+                          <div className="text-sm text-gray-400">{user.email || '-'}</div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 capitalize">{order.premiumType}</td>
+                      <td className="px-4 py-3">₹{order.price}</td>
+                      <td className="px-4 py-3">
+                        <span className="text-sm font-mono">{order._id || '-'}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.paymentStatus)} bg-opacity-20 text-white`}>
+                          {order.paymentStatus}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '-'}
+                      </td>
+                      <td className="px-4 py-3">
+                        {order.expiresAt ? new Date(order.expiresAt).toLocaleDateString() : '-'}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
