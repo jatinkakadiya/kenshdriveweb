@@ -9,6 +9,7 @@ import Path from "../Path";
 export default function Footer() {
     const [isOpen, setIsOpen] = useState(false);
     const closeButtonRef = useRef(null);
+    const [privacyOpen, setPrivacyOpen] = useState(false);
 
     // Focus management for accessibility
     useEffect(() => {
@@ -108,9 +109,12 @@ export default function Footer() {
                             Terms & Conditions
                         </button>
                         <div className="bg-gray-700 w-px h-4"></div>
-                        <Link to="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+                        <button
+                            onClick={() => setPrivacyOpen(true)}
+                            className="text-gray-400 hover:text-white transition-colors text-sm"
+                        >
                             Privacy Policy
-                        </Link>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -218,6 +222,105 @@ export default function Footer() {
               <h2 className="font-bold text-lg text-gray-900">10. Contact Information</h2>
               <p>KenshDrive Support<br />Email: kensdrive@gmail.com</p>
             </section>
+          </div>
+        </Dialog.Panel>
+      </div>
+    </Dialog>
+    {/* Privacy Policy Modal */}
+    <Dialog
+      open={privacyOpen}
+      onClose={() => setPrivacyOpen(false)}
+      className="relative z-50"
+      initialFocus={closeButtonRef}
+    >
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" />
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        <Dialog.Panel className="mx-auto max-w-3xl w-full rounded-lg bg-white p-6 max-h-[90vh] overflow-y-auto shadow-xl">
+          <div className="flex justify-between items-start mb-4">
+            <Dialog.Title className="text-2xl font-bold text-gray-800">
+              Privacy Policy for KenshDrive
+            </Dialog.Title>
+            <button
+              ref={closeButtonRef}
+              onClick={() => setPrivacyOpen(false)}
+              className="text-gray-500 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 text-xl font-bold p-1 rounded transition-colors"
+              aria-label="Close privacy dialog"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="text-base text-gray-700 space-y-4 pr-4" style={{ whiteSpace: 'pre-line' }}>
+{`
+Effective Date: 21/7/25
+
+At KenshDrive, accessible from https://kensdrive.co.in/, we value your privacy and are committed to protecting your personal data. This Privacy Policy outlines the types of information we collect, how we use it, and the choices you have regarding your information.
+
+1. Information We Collect
+We collect the following types of data when you use our services:
+
+Personal Information: Such as name, email address, and contact details when voluntarily provided.
+
+Device Information: Browser type, IP address, operating system, and device type.
+
+Usage Data: Pages visited, features used, links clicked, time spent on the website, and referral source.
+
+We do not collect or store sensitive personal data unless necessary and explicitly provided by you.
+
+2. How We Use Your Information
+Your information may be used to:
+
+Provide, maintain, and improve our services.
+
+Send notifications and updates.
+
+Respond to customer service requests and technical support.
+
+Monitor analytics and user behavior to enhance functionality.
+
+Prevent fraud and ensure security.
+
+We do not sell or share your personal information with third parties for marketing purposes.
+
+3. Cookies & Tracking Technologies
+We use cookies and similar technologies to:
+
+Save your preferences.
+
+Improve website performance.
+
+Analyze traffic and user behavior.
+
+You can disable cookies in your browser settings, but some features may not function properly.
+
+4. Data Security
+We use industry-standard security measures such as HTTPS, encryption, and access control to protect your information. While we strive to secure your data, no method of transmission over the internet is 100% secure.
+
+5. Third-Party Services
+Our website may use or link to third-party services like analytics, hosting providers, or cloud storage. These services have their own privacy policies, and we encourage you to review them.
+
+6. Children's Privacy
+Our service is not intended for children under 13. We do not knowingly collect information from anyone under that age. If you believe a child has provided us with data, contact us and we will remove it.
+
+7. Your Rights
+You have the right to:
+
+Access, update, or delete your personal data.
+
+Withdraw consent at any time.
+
+Request a copy of the data we store.
+
+To exercise these rights, please contact us.
+
+8. Changes to This Privacy Policy
+We may update this Privacy Policy from time to time. Changes will be posted on this page with a new effective date. Continued use of the site indicates your agreement to the revised terms.
+
+9. Contact Us
+If you have questions about this Privacy Policy or your data, contact:
+
+KenshDrive Support
+Email: kensdrive@gmail.com
+`}
           </div>
         </Dialog.Panel>
       </div>

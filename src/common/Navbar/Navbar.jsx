@@ -15,12 +15,23 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [userInfo, setUserInfo] = useState(null);
 
   const isHome = location.pathname === Path.home; // e.g., "/"
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token && token !== 'undefined' && token !== 'null');
+    const userStr = localStorage.getItem('userinfo');
+    if (userStr) {
+      try {
+        setUserInfo(JSON.parse(userStr));
+      } catch {
+        setUserInfo(null);
+      }
+    } else {
+      setUserInfo(null);
+    }
   }, [location.pathname]);
 
   const handleUserClick = () => {
@@ -155,11 +166,23 @@ export default function Header() {
             className={`fixed top-0 right-0 h-screen w-3/4 max-w-xs z-50 bg-black shadow-lg flex flex-col justify-between transform transition-transform duration-300 translate-x-0`}
             style={{ minWidth: '260px' }}
           >
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
-            <h5 className="text-lg font-semibold text-white">Menu</h5>
-            <button type="button" className="text-gray-400 hover:text-white text-2xl" onClick={() => setOpen(false)}>
-              ×
-            </button>
+          <div className="flex flex-col items-center justify-center px-6 py-4 border-b border-gray-800">
+            <h5 className="text-lg font-semibold text-white w-full flex justify-between items-center">Menu
+              <button type="button" className="text-gray-400 hover:text-white text-2xl" onClick={() => setOpen(false)}>
+                ×
+              </button>
+            </h5>
+            {isLoggedIn && userInfo && (
+              <button
+                className="w-full flex flex-col items-center mt-2 mb-2 p-2 bg-[#18181b] rounded-lg focus:outline-none hover:bg-gray-800 transition cursor-pointer"
+                onClick={() => { setOpen(false); navigate('/userprofile'); }}
+                type="button"
+              >
+                <AccountCircleIcon className="text-gray-300 text-4xl mb-1" style={{ fontSize: 40 }} />
+                <span className="text-white font-medium text-base">{userInfo.name || userInfo.username || userInfo.email}</span>
+                {userInfo.email && <span className="text-gray-400 text-xs">{userInfo.email}</span>}
+              </button>
+            )}
           </div>
           <div className="flex-1 flex flex-col justify-between bg-black">
             <div className="p-6 flex flex-col gap-2">
