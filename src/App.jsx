@@ -24,6 +24,7 @@ import MovieDetailsScreen from './user/MovieDetailsScreen';
 import Historys from './common/Navbar/History';
 // import MovieForm from './Admin/page/MovieCreateForm';
 // import VideoUploadPreview from './user/localuploderscreen';
+import PrivateRoute from './common/Auth/PrivateRoute';
 
 
 function App() {
@@ -47,51 +48,51 @@ function App() {
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <BrowserRouter>
         <Routes>
-          <Route path='/admin' element={<DeshbordLayouts>
+          <Route path='/admin' element={<PrivateRoute><DeshbordLayouts>
             <MovieAnalytics/>
-          </DeshbordLayouts>} />
+          </DeshbordLayouts></PrivateRoute>} />
           <Route path='/login' element={<LoginForm/>}/>
           <Route path='/register' element={<RegisterForm/>}/>
-          <Route path='*' element={<DeshbordLayouts>
+          <Route path='*' element={<PrivateRoute><DeshbordLayouts>
             <MovieComingSoon/>
-          </DeshbordLayouts>} /> 
-          <Route path='/movies' element={<DeshbordLayouts>
+          </DeshbordLayouts></PrivateRoute>} /> 
+          <Route path='/movies' element={<PrivateRoute><DeshbordLayouts>
             <MoviesList/>
-          </DeshbordLayouts>} /> 
+          </DeshbordLayouts></PrivateRoute>} /> 
          
           <Route path='/login'element={<Userpage>
             <LoginForm/>
           </Userpage>}/>
-          <Route path="/premium" element={<DeshbordLayouts>
+          <Route path="/premium" element={<PrivateRoute><DeshbordLayouts>
             <PremiumPlans/>
-          </DeshbordLayouts>}/>
-          <Route path="/order" element={<DeshbordLayouts>
+          </DeshbordLayouts></PrivateRoute>}/>
+          <Route path="/order" element={<PrivateRoute><DeshbordLayouts>
             <Orders/>
-          </DeshbordLayouts>}/>
-          <Route path="/trials" element={<DeshbordLayouts>
+          </DeshbordLayouts></PrivateRoute>}/>
+          <Route path="/trials" element={<PrivateRoute><DeshbordLayouts>
             <Trials/>
-          </DeshbordLayouts>}/>
-          <Route path='/' element={<Userpage>
+          </DeshbordLayouts></PrivateRoute>}/>
+          <Route path='/' element={<PrivateRoute><Userpage>
             <HomeScreen/>
-          </Userpage>} />
-          <Route path='/supports' element={<Userpage>
+          </Userpage></PrivateRoute>} />
+          <Route path='/supports' element={<PrivateRoute><Userpage>
             <SupportScreen/>
-          </Userpage>} />
-          <Route path='/subscription' element={<Userpage>
+          </Userpage></PrivateRoute>} />
+          <Route path='/subscription' element={<PrivateRoute><Userpage>
             <SubscriptionsScreen/>
-          </Userpage>} />
-          <Route path='/video-upload' element={<Userpage>
+          </Userpage></PrivateRoute>} />
+          <Route path='/video-upload' element={<PrivateRoute><Userpage>
             <VideoUploadPreview/>
-          </Userpage>} />
-          <Route path='/userprofile' element={<Userpage>
+          </Userpage></PrivateRoute>} />
+          <Route path='/userprofile' element={<PrivateRoute><Userpage>
             <UserScreen/>
-          </Userpage>} />
-          <Route path='/watch' element={<Userpage>
+          </Userpage></PrivateRoute>} />
+          <Route path='/watch' element={<PrivateRoute><Userpage>
             <MovieDetailsScreen/>
-          </Userpage>} />
-          <Route path='/history' element={<Userpage>
+          </Userpage></PrivateRoute>} />
+          <Route path='/history' element={<PrivateRoute><Userpage>
             <Historys/>
-          </Userpage>} />
+          </Userpage></PrivateRoute>} />
         </Routes>
       </BrowserRouter>
     </LocalizationProvider>
